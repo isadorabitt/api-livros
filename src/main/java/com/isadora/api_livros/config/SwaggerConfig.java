@@ -48,8 +48,9 @@ public class SwaggerConfig {
                                 .url("http://localhost:8080")
                                 .description("Ambiente de Desenvolvimento Local"),
                         new Server()
-                                .url("https://api-livros-demo.up.railway.app")
-                                .description("Ambiente de Demonstração (fake)")
+                                .url("https://${RAILWAY_PUBLIC_DOMAIN:api-livros-demo.up.railway.app}")
+                                .description("Ambiente de Produção")
+
                 ));
     }
 
