@@ -8,6 +8,7 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,12 +28,14 @@ public class SwaggerConfig {
                                 ## API REST para gerenciamento de livros com integração ao Google Books
                                 **Projeto desenvolvido para portfólio Java Junior**
                                 
-                                ### Features destacáveis:
-                                - CRUD completo de livros
-                                - Integração com API do Google Books
-                                - Documentação Swagger/OpenAPI
+                                ### Funcionalidades:
+                                - **Livros Locais**: CRUD completo de livros armazenados localmente
+                                - **Google Books**: Integração com API externa para busca e importação de livros
+                                
+                                ### Tecnologias:
                                 - Validações customizadas
                                 - Tratamento de erros personalizado
+                                - Documentação Swagger/OpenAPI
                                 """)
                         .contact(new Contact()
                                 .name("Isadora Bittencourt")
@@ -43,6 +46,10 @@ public class SwaggerConfig {
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")
                         ))
+                .tags(List.of(
+                        new Tag().name("1. Livros Locais").description("Operações CRUD para livros armazenados localmente"),
+                        new Tag().name("2. Google Books").description("Operações de integração com a API do Google Books")
+                ))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:8080")
@@ -50,7 +57,6 @@ public class SwaggerConfig {
                         new Server()
                                 .url("https://${RAILWAY_PUBLIC_DOMAIN:api-livros-demo.up.railway.app}")
                                 .description("Ambiente de Produção")
-
                 ));
     }
 
@@ -58,7 +64,6 @@ public class SwaggerConfig {
     public OpenApiCustomizer globalResponsesCustomizer() {
         return openApi -> {
             openApi.getPaths().values().forEach(pathItem -> pathItem.readOperations().forEach(operation -> {
-
                 // Respostas globais para erros
                 ApiResponse badRequest = new ApiResponse()
                         .description("Requisição inválida")

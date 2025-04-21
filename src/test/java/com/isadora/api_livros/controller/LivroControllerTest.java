@@ -1,6 +1,7 @@
 package com.isadora.api_livros.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.isadora.api_livros.dto.LivroDTO;
 import com.isadora.api_livros.exception.LivroDuplicadoException;
 import com.isadora.api_livros.model.Livro;
 import com.isadora.api_livros.service.GoogleBooksService;
@@ -26,25 +27,24 @@ class LivroControllerTest {
     private LivroService livroService;
 
     @MockBean
-    private GoogleBooksService googleBooksService; // Adicionado o mock para GoogleBooksService
+    private GoogleBooksService googleBooksService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void deveCadastrarLivroComSucesso() throws Exception {
         // Arrange
-        Livro livroRequest = new Livro(null, "Título Exemplo", "Autor Exemplo");
-        Livro livroResponse = new Livro(1L, "Título Exemplo", "Autor Exemplo");
+        LivroDTO livroRequest = new LivroDTO("Título Exemplo", "Autor Exemplo");
+        Livro livroSalvo = new Livro(1L, "Título Exemplo", "Autor Exemplo");
 
-        // Configura o mock
         Mockito.when(livroService.salvarLivro(Mockito.any(Livro.class)))
-                .thenReturn(livroResponse);
+                .thenReturn(livroSalvo);
 
         // Act & Assert
-        mockMvc.perform(post("/livros")
+        mockMvc.perform(post("/api/livros")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(livroRequest)))
-                .andExpect(status().isOk()) // Mantido como 200 para alinhar com o controller
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.titulo").value("Título Exemplo"))
                 .andExpect(jsonPath("$.autor").value("Autor Exemplo"));
@@ -53,17 +53,16 @@ class LivroControllerTest {
     @Test
     void naoDeveCadastrarLivroDuplicado() throws Exception {
         // Arrange
-        Livro livro = new Livro(null, "Título Duplicado", "Autor Exemplo");
+        LivroDTO livroRequest = new LivroDTO("Título Duplicado", "Autor Exemplo");
         String mensagemErro = "Já existe um livro com este título.";
 
-        // Configura o mock para lançar exceção
         Mockito.when(livroService.salvarLivro(Mockito.any(Livro.class)))
                 .thenThrow(new LivroDuplicadoException(mensagemErro));
 
         // Act & Assert
-        mockMvc.perform(post("/livros")
+        mockMvc.perform(post("/api/livros")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livro)))
+                        .content(objectMapper.writeValueAsString(livroRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(mensagemErro));
     }
